@@ -1,4 +1,4 @@
-﻿# Created by Txmmy
+# Created by Txmmy
 # GamerOS ISO Editor (WIP)
 # Use Example #
 # Remove Use: "Function", 
@@ -11,15 +11,19 @@ $tweaks = @(
 
 ### File Structure ###
 "SetupFileStructure",
-"Windows10MediaTool",
+"CreateAutoUnattend",
 
 ### Dism Prepare ISO ###
 "AskUserIsoExtract",
 "RemoveWindowsImages",
 "PrepareWindowsImage",
 "OptimizeFileStruct",
-"CreateAutoUnattend",
 "MountWindowsImage",
+
+### Edit Registry ###
+"LoadRegistry",
+"ImportRegistry",
+"UnloadRegistry",
 
 ### Dism Reduce ISO ###
 "RemoveWinAppxPkgs",
@@ -67,17 +71,6 @@ New-Item -Path 'C:\ISO_Editor\WindowsImage\' -ItemType Directory | Out-Null
 If (!(Test-Path 'C:\ISO_Editor\MountPoint\')) {
 New-Item -Path 'C:\ISO_Editor\MountPoint\' -ItemType Directory | Out-Null
 }
-}
-
-Function Windows10MediaTool {
-# Source file location
-$source = 'https://go.microsoft.com/fwlink/?LinkId=691209'
-
-# Destination to save the file
-$destination = 'C:\ISO_Editor\Win10MediaCreationTool.exe'
-
-# Download the source file and save it to destination
-Invoke-WebRequest -Uri $source -OutFile $destination
 }
 
 ##########
@@ -343,6 +336,7 @@ Remove-Item -Path "C:\ISO_Editor\WindowsImage\Sources\winsetupboot.hiv"
 Remove-Item -Path "C:\ISO_Editor\WindowsImage\Sources\winsetupboot.sys"
 Remove-Item -Path "C:\ISO_Editor\WindowsImage\Sources\wpx.dll"
 Remove-Item -Path "C:\ISO_Editor\WindowsImage\Sources\ws.dat"
+Remove-Item -Path "C:\ISO_Editor\WindowsImage\setup.exe"
 Remove-Item -Path "C:\ISO_Editor\WindowsImage\Support" -Recurse -Force -Confirm:$false
 $ErrorActionPreference = $errpref
 }
@@ -350,6 +344,52 @@ $ErrorActionPreference = $errpref
 Function MountWindowsImage {
 Write-Host "Mounting Windows Iso" -ForegroundColor Cyan
 Dism /Mount-Image /ImageFile:C:\ISO_Editor\WindowsImage\Sources\Install.wim /Index:1  /MountDir:C:\ISO_Editor\MountPoint\
+}
+
+##########
+# Edit Iso Registry
+##########
+
+Function LoadRegistry {
+Write-Host "Editing Windows Registry" -ForegroundColor Cyan
+reg load HKLM\GAMEROS_DEFAULT "C:\ISO_Editor\MountPoint\Windows\System32\config\DEFAULT" | Out-Null
+reg load HKLM\GAMEROS_SYSTEM "C:\ISO_Editor\MountPoint\Windows\System32\config\SYSTEM" | Out-Null
+reg load HKLM\GAMEROS_SOFTWARE "C:\ISO_Editor\MountPoint\Windows\System32\config\SOFTWARE" | Out-Null
+reg load HKLM\GAMEROS_NTUSER "C:\ISO_Editor\MountPoint\Users\Default\ntuser.dat" | Out-Null
+}
+
+Function ImportRegistry {
+New-Item "C:\ISO_Editor\GamerOS.reg" -ItemType File  -Value "Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\GAMEROS_SYSTEM\ControlSet001\Control\Power]
+""HibernateEnabledDefault""=dword:00000000
+
+[HKEY_LOCAL_MACHINE\GAMEROS_SYSTEM\ControlSet001\Control]
+""SvcHostSplitThresholdInKB""=dword:08000000
+
+[HKEY_LOCAL_MACHINE\GAMEROS_SOFTWARE\Policies\Microsoft\Windows\OneDrive]
+""DisableFileSyncNGSC""=dword:00000001
+
+[HKEY_LOCAL_MACHINE\GAMEROS_SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]
+""EnableFirstLogonAnimation""=dword:00000000
+
+[HKEY_LOCAL_MACHINE\GAMEROS_SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon]
+""EnableFirstLogonAnimation""=dword:00000000
+
+[HKEY_LOCAL_MACHINE\GAMEROS_SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile]
+""SystemResponsiveness""=dword:00000000
+""NetworkThrottlingIndex""=dword:ffffffff
+
+" | Out-Null
+reg import "C:\ISO_Editor\GamerOS.reg" | Out-Null
+}
+
+Function UnloadRegistry {
+Remove-Item -Path "C:\ISO_Editor\GamerOS.reg"
+reg unload HKLM\GAMEROS_DEFAULT | Out-Null
+reg unload HKLM\GAMEROS_SYSTEM | Out-Null
+reg unload HKLM\GAMEROS_SOFTWARE | Out-Null
+reg unload HKLM\GAMEROS_NTUSER | Out-Null
 }
 
 ##########
@@ -364,7 +404,7 @@ $errpref = $ErrorActionPreference
 $ErrorActionPreference = "silentlycontinue" #restore previous preference #save actual preference
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.549981C3F5F10_1.1911.21713.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.BingWeather_4.25.20211.0_neutral_~_8wekyb3d8bbwe | Out-Null
-#Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.DesktopAppInstaller_2019.125.2243.0_neutral_~_8wekyb3d8bbwe | Out-Null
+Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.DesktopAppInstaller_2019.125.2243.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.GetHelp_10.1706.13331.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.Getstarted_8.2.22942.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.HEIFImageExtension_1.0.22742.0_x64__8wekyb3d8bbwe | Out-Null
@@ -379,7 +419,7 @@ Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageNam
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.ScreenSketch_2019.904.1644.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.SkypeApp_14.53.77.0_neutral_~_kzf8qxf38zg5c | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.StorePurchaseApp_11811.1001.1813.0_neutral_~_8wekyb3d8bbwe | Out-Null
-#Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.VCLibs.140.00_14.0.27323.0_x64__8wekyb3d8bbwe | Out-Null
+Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.VCLibs.140.00_14.0.27323.0_x64__8wekyb3d8bbwe | Out-Null
 #Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.VP9VideoExtensions_1.0.22681.0_x64__8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.Wallet_2.4.18324.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.WebMediaExtensions_1.0.20875.0_neutral_~_8wekyb3d8bbwe | Out-Null
@@ -395,10 +435,10 @@ Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageNam
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.WindowsStore_11910.1002.513.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.Xbox.TCUI_1.23.28002.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxApp_48.49.31001.0_neutral_~_8wekyb3d8bbwe | Out-Null
-Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxGameOverlay_1.46.11001.0_neutral_~_8wekyb3d8bbwe | Out-Null
-Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxGamingOverlay_2.34.28001.0_neutral_~_8wekyb3d8bbwe | Out-Null
+#Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxGameOverlay_1.46.11001.0_neutral_~_8wekyb3d8bbwe | Out-Null
+#Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxGamingOverlay_2.34.28001.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxIdentityProvider_12.50.6001.0_neutral_~_8wekyb3d8bbwe | Out-Null
-Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxSpeechToTextOverlay_1.17.29001.0_neutral_~_8wekyb3d8bbwe | Out-Null
+#Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.XboxSpeechToTextOverlay_1.17.29001.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.YourPhone_2019.430.2026.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.ZuneMusic_2019.19071.19011.0_neutral_~_8wekyb3d8bbwe | Out-Null
 Dism /Image:C:\ISO_Editor\MountPoint\ /Remove-ProvisionedAppxPackage /PackageName:Microsoft.ZuneVideo_2019.19071.19011.0_neutral_~_8wekyb3d8bbwe | Out-Null
@@ -904,7 +944,8 @@ $ErrorActionPreference = $errpref
 }
 
 Function CreateAutoUnattend {
-Write-Host "Creating Auto Unattended File" -ForegroundColor Cyan
+$errpref = $ErrorActionPreference
+$ErrorActionPreference = "silentlycontinue" #restore previous preference #save actual preference
 New-Item -Path "C:\ISO_Editor\WindowsImage\" -Name "autounattend.xml" -ItemType File -Value {<?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
 	<settings pass="oobeSystem">
@@ -1013,6 +1054,7 @@ New-Item -Path "C:\ISO_Editor\WindowsImage\" -Name "autounattend.xml" -ItemType 
 	</settings>
 </unattend>
 } | Out-Null
+$ErrorActionPreference = $errpref
 }
 
 ##########
