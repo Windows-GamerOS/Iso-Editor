@@ -260,7 +260,7 @@ Write-Host "  ╚═╝╚══════╝ ╚═════╝       ╚�
 Write-Host "                                                                           " -ForegroundColor DarkCyan
 Write-Host "                                                                           " -ForegroundColor DarkCyan
 Write-Host "Please Use Tool To Download Microsoft Iso And " -ForegroundColor White
-Write-Host "Extract It To C:\ISO_Editor\WindowsImage\??" -ForegroundColor White
+Write-Host "Save It To Default MyDocument Location??" -ForegroundColor White
 Write-Host "Warning: If Iso Found Optimization Will Be Done" -ForegroundColor Green
 Write-Host "Warning: If No Iso Found Nothing Will Be Done" -ForegroundColor Red
 Write-Host "=============================================" -ForegroundColor White
