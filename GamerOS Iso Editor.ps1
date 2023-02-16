@@ -11,31 +11,31 @@ $tweaks = @(
 "SetLocation",
 
 ### File Structure ###
-"SetupFileStructure",
-"CreateUnattended",
-"WindowsMediaTool",
-"LaunchMediaTool",
+#"SetupFileStructure",
+#"CreateUnattended",
+#"WindowsMediaTool",
+#"LaunchMediaTool",
 
 ### Dism Prepare ISO ###
 "AskUserIsoExtract",
-"MountObtainedISO",
-"OptimizeFileStruct",
-"PrepareWindowsImage",
-"MountWindowsImage",
+#"MountObtainedISO",
+#"OptimizeFileStruct",
+#"PrepareWindowsImage",
+#"MountWindowsImage",
 
 ### Edit Registry ###
-"LoadRegistry",
-"ImportRegistry",
-"UnloadRegistry",
+#"LoadRegistry",
+#"ImportRegistry",
+#"UnloadRegistry",
 
 ### Dism Reduce ISO ###
-"RemoveWinAppxPkgs",
-"RemoveCapability",
-"RemoveFeatures",
+#"RemoveWinAppxPkgs",
+#"RemoveCapability",
+#"RemoveFeatures",
 
 ### Dism Create ISO ###
-"UnMountWindowsImage",
-"ReCompressMadeIso",
+#"UnMountWindowsImage",
+#"ReCompressMadeIso",
 "MakeIsoAvailable",
 
 ### Auxiliary Functions ###
@@ -1215,7 +1215,8 @@ $Target
 }
 
 Function MakeIsoAvailable {
-New-IsoFile -Source C:\ISO_Editor\WindowsImage -Path .\GAMEROS_DIY_IMAGE.iso -Force
+$source_dir = "C:\ISO_Editor\WindowsImage"
+get-childitem "$source_dir" | New-ISOFile -path .\GAMEROS_DIY_IMAGE.iso
 }
 
 ##########
