@@ -185,6 +185,8 @@ New-Item ".\autounattend.xml" -ItemType File  -Value "<?xml version=""1.0"" enco
 " | Out-Null
 $ErrorActionPreference = $errpref
 Move-item -path ".\autounattend.xml" -Destination "C:\ISO_Editor\WindowsImage\"
+Write-Host "Select MCT Defaults and Save ISO to Default Documents Location"
+Write-Host "Don't Close This PS Window, Click Finish and Watch Me Work"
 }
 }
 
@@ -232,6 +234,8 @@ Start-Process ".\21H2 MediaCreationTool.bat" -Verb RunAs -Wait
 Copy-item -path "$mydocuments\Windows.iso" -Destination "C:\ISO_Editor\ObtainedISO\"
 Remove-Item -Path "$mydocuments\Windows.iso" -Recurse
 Remove-Item -Path ".\21H2 MediaCreationTool.bat" -Recurse
+Remove-Item -Path "C:\$WINDOWS.~BT" -Recurse -Force
+Remove-Item -Path "C:\ESD" -Recurse
 $ErrorActionPreference = $errpref
 }
 }
@@ -260,10 +264,10 @@ Write-Host "  ██║███████║╚██████╔╝      
 Write-Host "  ╚═╝╚══════╝ ╚═════╝       ╚══════╝╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝  " -ForegroundColor DarkCyan
 Write-Host "                                                                           " -ForegroundColor DarkCyan
 Write-Host "                                                                           " -ForegroundColor DarkCyan
-Write-Host "Please Use Tool To Download Microsoft Iso And " -ForegroundColor White
-Write-Host "Save It To Default MyDocument Location??" -ForegroundColor White
-Write-Host "Warning: If Iso Found Optimization Will Be Done" -ForegroundColor Green
-Write-Host "Warning: If No Iso Found Nothing Will Be Done" -ForegroundColor Red
+Write-Host "Have You Used Tool To Download Microsoft Iso And " -ForegroundColor White
+Write-Host "Saved It To Default \Document Location??" -ForegroundColor White
+Write-Host "If Iso Found Optimization Will Be Done" -ForegroundColor Green
+Write-Host "If No Iso Found Nothing Will Be Done" -ForegroundColor Red
 Write-Host "=============================================" -ForegroundColor White
 Write-Host "Y: Press 'Y' to Cont" -ForegroundColor Green
 Write-Host "N: Press 'N' to Exit" -ForegroundColor Red
