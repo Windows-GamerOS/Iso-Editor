@@ -11,31 +11,31 @@ $tweaks = @(
 "SetLocation",
 
 ### File Structure ###
-#"SetupFileStructure",
-#"CreateUnattended",
-#"WindowsMediaTool",
-#"LaunchMediaTool",
+"SetupFileStructure",
+"CreateUnattended",
+"WindowsMediaTool",
+"LaunchMediaTool",
 
 ### Dism Prepare ISO ###
 "AskUserIsoExtract",
-#"MountObtainedISO",
-#"OptimizeFileStruct",
-#"PrepareWindowsImage",
-#"MountWindowsImage",
+"MountObtainedISO",
+"OptimizeFileStruct",
+"PrepareWindowsImage",
+"MountWindowsImage",
 
 ### Edit Registry ###
-#"LoadRegistry",
-#"ImportRegistry",
-#"UnloadRegistry",
+"LoadRegistry",
+"ImportRegistry",
+"UnloadRegistry",
 
 ### Dism Reduce ISO ###
-#"RemoveWinAppxPkgs",
-#"RemoveCapability",
-#"RemoveFeatures",
+"RemoveWinAppxPkgs",
+"RemoveCapability",
+"RemoveFeatures",
 
 ### Dism Create ISO ###
-#"UnMountWindowsImage",
-#"ReCompressMadeIso",
+"UnMountWindowsImage",
+"ReCompressMadeIso",
 "MakeIsoAvailable",
 
 ### Auxiliary Functions ###
